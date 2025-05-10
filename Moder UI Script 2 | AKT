@@ -1,0 +1,228 @@
+// ==UserScript==
+// @name         Legendary UI
+// @namespace    http://tampermonkey.net/
+// @version      OP
+// @description  A legendary UI for Narrow One with a futuristic and elegant design
+// @author       Chad AKT
+// @match        https://narrow.one/*
+// @grant        GM_addStyle
+// ==/UserScript==
+
+(function() {
+  'use strict';
+
+  // Add enhanced CSS styles
+  GM_addStyle(`
+    :root {
+      --BackgroundImage: url(https://i.ibb.co/Y2jRt5G/futuristic-bg.jpg); /* Futuristic background */
+      --NeonGrid: url(https://i.ibb.co/mTDk8sV/grid-pattern.png); /* Neon grid pattern */
+      --ButtonGlow: url(https://i.ibb.co/wgF1X52/button-glow.png); /* Button glow */
+      --PrimaryColor: #00ffff; /* Neon Cyan */
+      --SecondaryColor: #ff007f; /* Neon Pink */
+      --AccentColor: #ffff00; /* Neon Yellow */
+      --DarkAccent: #1a1a1a; /* Dark Gray */
+      --GlowEffect: 0 0 15px var(--PrimaryColor), 0 0 30px var(--SecondaryColor), 0 0 45px var(--AccentColor);
+    }
+
+    /* Global Body Styling */
+    body {
+      background: var(--BackgroundImage) no-repeat center center fixed;
+      background-size: cover;
+      color: var(--PrimaryColor);
+      font-family: 'Roboto', sans-serif;
+    }
+
+    /* Profile Container */
+    .main-menu-corner-profile {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 5px solid var(--AccentColor);
+      background: var(--NeonGrid) no-repeat center center;
+      background-size: cover;
+      padding: 1.5rem;
+      border-radius: 20px;
+      box-shadow: var(--GlowEffect);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: var(--GlowEffect);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px var(--PrimaryColor), 0 0 40px var(--SecondaryColor), 0 0 60px var(--AccentColor);
+      }
+    }
+
+    /* Button Container */
+    .main-menu-button-container {
+      position: relative;
+      margin: 1rem;
+      border: 4px solid var(--SecondaryColor);
+      border-radius: 15px;
+      overflow: hidden;
+      background: var(--ButtonGlow) no-repeat center center;
+      background-size: cover;
+      box-shadow: var(--GlowEffect);
+    }
+
+    .main-menu-button-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,0,127,0.4) 0%, rgba(0,255,255,0.2) 80%);
+      z-index: -1;
+    }
+
+    /* Dialogs and Containers */
+    div.dialog.wrinkledPaper,
+    .chat-container,
+    .health-ui-container,
+    .dialog-button {
+      padding: 1.5rem;
+      background: rgba(26, 26, 26, 0.8);
+      border: 3px solid var(--AccentColor);
+      border-radius: 10px;
+      box-shadow: var(--GlowEffect);
+    }
+
+    /* Avatar Styling */
+    .avatar {
+      padding: 1.5rem;
+      border: 6px solid var(--PrimaryColor);
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--PrimaryColor), var(--SecondaryColor));
+      box-shadow: 0 0 20px var(--AccentColor), 0 0 40px var(--SecondaryColor);
+    }
+
+    /* Text Enhancements */
+    div.dialogText,
+    h3.settings-group-header,
+    .playersListTeamTable,
+    .chat-container,
+    .paged-view-page-header-title,
+    .dialog-button,
+    .kills-display,
+    h2.dialogTitle,
+    .squad-id,
+    h3.dialogTitle,
+    .settings-item-text,
+    .death-display {
+      text-shadow: 0 0 5px var(--PrimaryColor), 0 0 10px var(--SecondaryColor), 0 0 15px var(--AccentColor);
+      color: var(--AccentColor);
+    }
+
+    .whiteBigText {
+      color: var(--PrimaryColor);
+    }
+
+    .kills-display,
+    .death-display {
+      font-size: 26px;
+      font-weight: bold;
+      font-family: "Roboto", Arial, sans-serif;
+      color: var(--SecondaryColor);
+      padding: 10px;
+      display: block;
+      border: 3px solid var(--PrimaryColor);
+      border-radius: 10px;
+      background: var(--NeonGrid);
+      box-shadow: var(--GlowEffect);
+    }
+
+    .main-menu-button-text.blueNight {
+      color: var(--PrimaryColor);
+    }
+
+    h3.dialogTitle,
+    .map-item-title,
+    .paged-view-page-header-title {
+      color: var(--PrimaryColor);
+    }
+
+    h2.dialogTitle,
+    .dialog-button {
+      color: var(--SecondaryColor);
+    }
+
+    div.dialogText,
+    .squad-id {
+      color: var(--PrimaryColor);
+    }
+
+    h3.settings-group-header {
+      color: var(--SecondaryColor);
+      background: transparent;
+    }
+
+    div.settings-item-text,
+    .chat-container {
+      color: var(--SecondaryColor);
+    }
+
+    thead,
+    .shopItemUsage-shop,
+    .shop-skin-selection-item,
+    .shop-class-selection-item,
+    .playersListTeamTable {
+      background: transparent;
+    }
+  `);
+
+  // Function to display kills and deaths
+  async function displayKillsAndDeaths() {
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+
+    var dbRequest = indexedDB.open("keyValuesDb");
+
+    dbRequest.onerror = function(event) {
+      console.error("Failed to open the database:", event.target.errorCode);
+    };
+
+    dbRequest.onsuccess = function(event) {
+      var db = event.target.result;
+      var transaction = db.transaction(["keyValues"], "readwrite");
+      var objectStore = transaction.objectStore("keyValues");
+      var request = objectStore.get('cachedProfileState');
+
+      request.onsuccess = function(event) {
+        var data = event.target.result;
+        const kills = JSON.stringify(data.stats.kills);
+        const deaths = JSON.stringify(data.stats.deaths);
+
+        var profileElement = document.querySelector(".main-menu-corner-profile");
+
+        if (profileElement) {
+          var killsDisplay = document.createElement("div");
+          var deathsDisplay = document.createElement("div");
+
+          killsDisplay.textContent = "Kills: " + kills;
+          killsDisplay.className = "kills-display";
+
+          deathsDisplay.textContent = "Deaths: " + deaths;
+          deathsDisplay.className = "death-display";
+
+          profileElement.appendChild(killsDisplay);
+          profileElement.appendChild(deathsDisplay);
+        } else {
+          console.error("Element .main-menu-corner-profile not found.");
+        }
+      };
+
+      request.onerror = function(event) {
+        console.error("Error retrieving data:", event.target.errorCode);
+      };
+    };
+  }
+
+  // Execute the function
+  displayKillsAndDeaths();
+})();
